@@ -1,0 +1,19 @@
+# Auto detect text files and perform LF normalization on checkout
+* text=auto eol=lf
+
+# Explicit text files
+*.html diff=html
+*.css diff=css
+*.js text
+*.json text
+*.md text
+*.v text
+*.circ text
+*.svg text
+
+# Explicit binary files
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.pdf binary
+*.ico binary

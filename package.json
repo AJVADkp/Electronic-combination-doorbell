@@ -1,0 +1,22 @@
+{
+  "name": "electronic-combination-doorbell",
+  "version": "1.0.0",
+  "description": "Sequential 3-button electronic combination doorbell (B1 → B2 → B3) implemented as a synchronous Moore FSM with synthesizable Verilog HDL, gate-level schematic, and an interactive Web Audio hardware simulator.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "sim": "iverilog -o sim.vvp verilog/tb_combination_doorbell.v verilog/combination_doorbell.v && vvp sim.vvp"
+  },
+  "keywords": [
+    "fsm",
+    "moore-machine",
+    "digital-electronics",
+    "verilog",
+    "hdl",
+    "doorbell-security",
+    "sequential-logic",
+    "web-audio-api"
+  ],
+  "author": "Christ College of Engineering (Autonomous)",
+  "license": "MIT"
+}

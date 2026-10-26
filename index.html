@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Electronic Combination Doorbell | Digital Electronics</title>
+  <meta name="description" content="Sequential 3-button electronic combination doorbell (B1 → B2 → B3) — R25DER302 Digital Electronics Microproject.">
+
+  <!-- Modern Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="sections.css">
+</head>
+<body>
+  <!-- Ambient Background Glows -->
+  <div class="ambient-glow ambient-orange"></div>
+  <div class="ambient-glow ambient-red" id="ambientRedGlow"></div>
+  <div class="grid-overlay"></div>
+
+  <div class="page-wrapper">
+
+    <!-- ═══════════════════════════════════════════════════════════
+         SECTION 1: PROJECT HEADER BANNER
+         ═══════════════════════════════════════════════════════════ -->
+    <header class="project-header-banner">
+      <div class="project-badge">MICRO PROJECT · R25DER302 · DIGITAL ELECTRONICS</div>
+      <h1 class="project-title">Electronic Combination Doorbell</h1>
+      <p class="project-subtitle">
+        A 4-State Synchronous Moore FSM that rings only after the correct input sequence:
+        <span class="seq-highlight">B1 → B2 → B3</span>
+      </p>
+      <div class="project-meta">
+        <span>Department of Computer Science &amp; Engineering</span>
+        <span class="meta-sep">·</span>
+        <span>Christ College of Engineering (Autonomous), Irinjalakuda</span>
+      </div>
+    </header>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         SECTION 2: WORKING DOORBELL MODEL (Original UI)
+         ═══════════════════════════════════════════════════════════ -->
+    <section class="section-wrapper" id="section-demo">
+      <div class="section-label">
+        <span class="section-num">01</span>
+        <span class="section-title">Live Hardware Simulation</span>
+        <span class="section-desc">Interactive doorbell — press B1 → B2 → B3 in order to ring the bell</span>
+      </div>
+
+      <main class="device-card">
+        <div class="device-chassis">
+          <!-- Metallic Screws -->
+          <span class="screw top-left"></span>
+          <span class="screw top-right"></span>
+          <span class="screw bottom-left"></span>
+          <span class="screw bottom-right"></span>
+
+          <!-- Chassis Header -->
+          <div class="chassis-header">
+            <div class="brand-text">
+              <span class="brand-name">APEX GUARD</span>
+              <span class="brand-model">SECURE-BELL 3.0</span>
+            </div>
+            <div class="header-right-group">
+              <button id="soundToggleBtn" class="sound-chip-btn" title="Toggle Sound">
+                <svg id="soundIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                  <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                </svg>
+                <span id="soundStatusText">SOUND ON</span>
+              </button>
+              <div class="security-status-chip" id="securityStatusChip">
+                <span class="status-indicator-dot"></span>
+                <span id="securityStatusLabel">STANDBY</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Alarm Module -->
+          <div class="alarm-module">
+            <div class="red-light-container" id="redLightBox">
+              <div class="led-bezel">
+                <div class="red-led" id="redLed">
+                  <div class="led-core"></div>
+                  <div class="led-lens-glare"></div>
+                  <div class="led-pulse-rings">
+                    <span class="ring ring-1"></span>
+                    <span class="ring ring-2"></span>
+                    <span class="ring ring-3"></span>
+                  </div>
+                </div>
+              </div>
+              <div class="led-status-caption">
+                <span class="caption-label">BELL OUTPUT (RED LIGHT)</span>
+                <span class="caption-state" id="bellOutputState">OFF (LOW · 0V)</span>
+              </div>
+            </div>
+
+            <div class="speaker-grille" id="speakerGrille">
+              <div class="grille-row"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+              <div class="grille-row"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+              <div class="grille-row"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+              <div class="grille-row"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+              <div class="sound-wave-particles" id="soundWaves">
+                <span class="wave wave-1"></span>
+                <span class="wave wave-2"></span>
+                <span class="wave wave-3"></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- FSM Register Display -->
+          <div class="register-display-plate">
+            <div class="reg-label-group">
+              <span class="reg-title">FSM REGISTER (Q1, Q0)</span>
+              <span class="reg-verilog">state &le; [1:0]</span>
+            </div>
+            <div class="reg-digits-wrap">
+              <div class="bit-box" id="bitQ1">
+                <span class="bit-sub">Q1</span>
+                <span class="bit-val" id="valQ1">0</span>
+              </div>
+              <div class="bit-box" id="bitQ0">
+                <span class="bit-sub">Q0</span>
+                <span class="bit-val" id="valQ0">0</span>
+              </div>
+              <div class="state-badge-wrap">
+                <span class="state-pill state-idle" id="currentStateBadge">IDLE</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- LCD Status Screen -->
+          <div class="lcd-screen" id="lcdScreen">
+            <div class="lcd-glare"></div>
+            <div class="lcd-header">
+              <span class="lcd-dot"></span>
+              <span class="lcd-title">SYSTEM STATUS</span>
+              <span class="lcd-clock" id="lcdClock">CLK: 0</span>
+            </div>
+            <div class="lcd-message" id="lcdMessage">
+              Please enter access sequence: Press Button 1 (B1).
+            </div>
+            <div class="lcd-progress-bar">
+              <div class="progress-step step-1 active" id="progStep1">B1</div>
+              <div class="progress-arrow">&rarr;</div>
+              <div class="progress-step step-2" id="progStep2">B2</div>
+              <div class="progress-arrow">&rarr;</div>
+              <div class="progress-step step-3" id="progStep3">B3</div>
+            </div>
+          </div>
+
+          <!-- 3 Sequential Push Buttons -->
+          <div class="keypad-section">
+            <div class="keypad-label-row">
+              <span>SEQUENTIAL PUSH BUTTONS</span>
+              <span class="hint-text">Required: B1 &rarr; B2 &rarr; B3</span>
+            </div>
+            <div class="doorbell-buttons-grid">
+              <button class="push-btn" id="btnB1" data-btn="1" aria-label="Button 1">
+                <div class="btn-cap">
+                  <span class="btn-id">B1</span>
+                  <span class="btn-subtext">INPUT 1</span>
+                  <div class="btn-indicator" id="indB1"></div>
+                </div>
+                <div class="btn-shadow"></div>
+              </button>
+
+              <button class="push-btn" id="btnB2" data-btn="2" aria-label="Button 2">
+                <div class="btn-cap">
+                  <span class="btn-id">B2</span>
+                  <span class="btn-subtext">INPUT 2</span>
+                  <div class="btn-indicator" id="indB2"></div>
+                </div>
+                <div class="btn-shadow"></div>
+              </button>
+
+              <button class="push-btn" id="btnB3" data-btn="3" aria-label="Button 3">
+                <div class="btn-cap">
+                  <span class="btn-id">B3</span>
+                  <span class="btn-subtext">INPUT 3</span>
+                  <div class="btn-indicator" id="indB3"></div>
+                </div>
+                <div class="btn-shadow"></div>
+              </button>
+            </div>
+          </div>
+
+          <!-- Footer Reset -->
+          <div class="chassis-footer">
+            <button class="discrete-reset-btn" id="hwResetBtn" title="Reset FSM to IDLE (rst=1)">
+              <span class="reset-icon">&#8634;</span>
+              <span>HARDWARE RST</span>
+            </button>
+            <div class="fsm-spec-note">
+              <span>ACTIVE HIGH PULSE</span>
+              <span>CLK SYNC: POS EDGE</span>
+            </div>
+          </div>
+        </div>
+      </main>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         SECTION 3: FSM STATE DIAGRAM
+         ═══════════════════════════════════════════════════════════ -->
+    <section class="section-wrapper" id="section-fsm">
+      <div class="section-label">
+        <span class="section-num">02</span>
+        <span class="section-title">FSM State Diagram &amp; Transition Table</span>
+        <span class="section-desc">4-state Moore machine — 2-bit binary encoded (Q1, Q0)</span>
+      </div>
+
+      <div class="content-card">
+        <!-- SVG State Diagram -->
+        <div class="fsm-diagram-container">
+          <svg viewBox="0 0 900 420" class="fsm-svg" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <marker id="arr-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+                <path d="M0,1 L9,5 L0,9 Z" fill="#ff6b00"/>
+              </marker>
+              <marker id="arr-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+                <path d="M0,1 L9,5 L0,9 Z" fill="#ef4444"/>
+              </marker>
+              <marker id="arr-green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+                <path d="M0,1 L9,5 L0,9 Z" fill="#22c55e"/>
+              </marker>
+              <filter id="glow-node">
+                <feDropShadow dx="0" dy="0" stdDeviation="6" flood-color="#ff6b00" flood-opacity="0.5"/>
+              </filter>
+              <filter id="glow-unlock">
+                <feDropShadow dx="0" dy="0" stdDeviation="8" flood-color="#22c55e" flood-opacity="0.7"/>
+              </filter>
+            </defs>
+
+            <!-- ── TRANSITION ARROWS ── -->
+
+            <!-- IDLE → S1 (B1=1) -->
+            <line x1="162" y1="210" x2="288" y2="210" stroke="#ff6b00" stroke-width="2.5" marker-end="url(#arr-blue)"/>
+            <text x="225" y="200" fill="#ff6b00" font-size="13" font-family="JetBrains Mono" font-weight="700" text-anchor="middle">B1=1</text>
+
+            <!-- S1 → S2 (B2=1) -->
+            <line x1="422" y1="210" x2="548" y2="210" stroke="#ff6b00" stroke-width="2.5" marker-end="url(#arr-blue)"/>
+            <text x="485" y="200" fill="#ff6b00" font-size="13" font-family="JetBrains Mono" font-weight="700" text-anchor="middle">B2=1</text>
+
+            <!-- S2 → UNLOCK (B3=1) -->
+            <line x1="682" y1="210" x2="783" y2="210" stroke="#22c55e" stroke-width="3" marker-end="url(#arr-green)"/>
+            <text x="732" y="200" fill="#22c55e" font-size="13" font-family="JetBrains Mono" font-weight="700" text-anchor="middle">B3=1</text>
+
+            <!-- UNLOCK → IDLE (auto next clk) — arc top -->
+            <path d="M820,170 C820,60 80,60 80,170" fill="none" stroke="#ff6b00" stroke-width="2" stroke-dasharray="6,4" marker-end="url(#arr-blue)"/>
+            <text x="450" y="45" fill="#ff6b00" font-size="12" font-family="JetBrains Mono" font-weight="600" text-anchor="middle">Auto-return (next CLK) · Bell rings 1 cycle</text>
+
+            <!-- S1 → IDLE (wrong: B1 or B3) — arc below -->
+            <path d="M355,255 C340,330 145,330 110,255" fill="none" stroke="#ef4444" stroke-width="2" stroke-dasharray="4,3" marker-end="url(#arr-red)"/>
+            <text x="230" y="350" fill="#ef4444" font-size="11" font-family="JetBrains Mono" text-anchor="middle">B1=1 or B3=1</text>
+
+            <!-- S2 → IDLE (wrong: B1 or B2) — arc below -->
+            <path d="M615,255 C600,370 120,370 100,255" fill="none" stroke="#ef4444" stroke-width="2" stroke-dasharray="4,3" marker-end="url(#arr-red)"/>
+            <text x="360" y="390" fill="#ef4444" font-size="11" font-family="JetBrains Mono" text-anchor="middle">B1=1 or B2=1 (Wrong Input → IDLE)</text>
+
+            <!-- IDLE self-loop -->
+            <path d="M75,170 C30,130 30,175 75,195" fill="none" stroke="#94a3b8" stroke-width="1.8" marker-end="url(#arr-blue)"/>
+            <text x="15" y="158" fill="#94a3b8" font-size="10" font-family="JetBrains Mono">~B1</text>
+
+            <!-- S1 self-loop -->
+            <path d="M335,165 C310,118 390,118 365,165" fill="none" stroke="#94a3b8" stroke-width="1.8" marker-end="url(#arr-blue)"/>
+            <text x="350" y="110" fill="#94a3b8" font-size="10" font-family="JetBrains Mono" text-anchor="middle">no_btn</text>
+
+            <!-- S2 self-loop -->
+            <path d="M595,165 C570,118 650,118 625,165" fill="none" stroke="#94a3b8" stroke-width="1.8" marker-end="url(#arr-blue)"/>
+            <text x="610" y="110" fill="#94a3b8" font-size="10" font-family="JetBrains Mono" text-anchor="middle">no_btn</text>
+
+            <!-- ── STATE NODES ── -->
+
+            <!-- IDLE (2'b00) -->
+            <circle cx="110" cy="210" r="52" fill="#fff8f0" stroke="#ff6b00" stroke-width="3" filter="url(#glow-node)"/>
+            <text x="110" y="202" fill="#0f172a" font-size="18" font-family="JetBrains Mono" font-weight="800" text-anchor="middle">IDLE</text>
+            <text x="110" y="220" fill="#ff6b00" font-size="13" font-family="JetBrains Mono" font-weight="600" text-anchor="middle">2'b00</text>
+            <text x="110" y="237" fill="#64748b" font-size="11" font-family="JetBrains Mono" text-anchor="middle">Bell=0</text>
+
+            <!-- S1 (2'b01) -->
+            <circle cx="355" cy="210" r="52" fill="#fff8f0" stroke="#ff6b00" stroke-width="3" filter="url(#glow-node)"/>
+            <text x="355" y="202" fill="#0f172a" font-size="18" font-family="JetBrains Mono" font-weight="800" text-anchor="middle">S1</text>
+            <text x="355" y="220" fill="#ff6b00" font-size="13" font-family="JetBrains Mono" font-weight="600" text-anchor="middle">2'b01</text>
+            <text x="355" y="237" fill="#64748b" font-size="11" font-family="JetBrains Mono" text-anchor="middle">Bell=0</text>
+
+            <!-- S2 (2'b10) -->
+            <circle cx="615" cy="210" r="52" fill="#fff8f0" stroke="#ff6b00" stroke-width="3" filter="url(#glow-node)"/>
+            <text x="615" y="202" fill="#0f172a" font-size="18" font-family="JetBrains Mono" font-weight="800" text-anchor="middle">S2</text>
+            <text x="615" y="220" fill="#ff6b00" font-size="13" font-family="JetBrains Mono" font-weight="600" text-anchor="middle">2'b10</text>
+            <text x="615" y="237" fill="#64748b" font-size="11" font-family="JetBrains Mono" text-anchor="middle">Bell=0</text>
+
+            <!-- UNLOCK (2'b11) — double ring -->
+            <circle cx="830" cy="210" r="56" fill="#f0fff4" stroke="#22c55e" stroke-width="4" filter="url(#glow-unlock)"/>
+            <circle cx="830" cy="210" r="44" fill="none" stroke="#22c55e" stroke-width="2" stroke-dasharray="5,3"/>
+            <text x="830" y="198" fill="#0f172a" font-size="15" font-family="JetBrains Mono" font-weight="800" text-anchor="middle">UNLOCK</text>
+            <text x="830" y="215" fill="#22c55e" font-size="12" font-family="JetBrains Mono" font-weight="700" text-anchor="middle">2'b11</text>
+            <text x="830" y="230" fill="#16a34a" font-size="11" font-family="JetBrains Mono" font-weight="700" text-anchor="middle">Bell=1 ★</text>
+          </svg>
+        </div>
+
+        <!-- State Transition Table -->
+        <div class="fsm-table-wrapper">
+          <h3 class="table-title">State Transition Table</h3>
+          <div class="table-scroll">
+            <table class="fsm-table">
+              <thead>
+                <tr>
+                  <th>State</th>
+                  <th>Code [Q1 Q0]</th>
+                  <th>Input Condition</th>
+                  <th>Next State</th>
+                  <th>Bell</th>
+                  <th>Meaning</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="ts-badge ts-idle">IDLE</span></td>
+                  <td><code>00</code></td>
+                  <td><code>B1 = 1</code> / <code>B2 or B3 = 1</code></td>
+                  <td><span class="ts-badge ts-s1">S1</span> / <span class="ts-badge ts-idle">IDLE</span></td>
+                  <td><span class="val-lo">0</span></td>
+                  <td>Waiting for first button B1</td>
+                </tr>
+                <tr>
+                  <td><span class="ts-badge ts-s1">S1</span></td>
+                  <td><code>01</code></td>
+                  <td><code>B2 = 1</code> / <code>B1 or B3 = 1</code></td>
+                  <td><span class="ts-badge ts-s2">S2</span> / <span class="ts-badge ts-idle">IDLE</span></td>
+                  <td><span class="val-lo">0</span></td>
+                  <td>B1 valid; waiting for B2</td>
+                </tr>
+                <tr>
+                  <td><span class="ts-badge ts-s2">S2</span></td>
+                  <td><code>10</code></td>
+                  <td><code>B3 = 1</code> / <code>B1 or B2 = 1</code></td>
+                  <td><span class="ts-badge ts-unlock">UNLOCK</span> / <span class="ts-badge ts-idle">IDLE</span></td>
+                  <td><span class="val-lo">0</span></td>
+                  <td>B1+B2 valid; waiting for B3</td>
+                </tr>
+                <tr class="tr-unlock">
+                  <td><span class="ts-badge ts-unlock">UNLOCK</span></td>
+                  <td><code>11</code></td>
+                  <td>Next CLK (auto)</td>
+                  <td><span class="ts-badge ts-idle">IDLE</span></td>
+                  <td><span class="val-hi">1 ★ RINGING</span></td>
+                  <td>Sequence accepted — bell rings 1 cycle!</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Synthesized Boolean Equations from K-Map -->
+        <div class="equations-panel" style="margin-top: 2rem;">
+          <h3 class="eq-title">Synthesized Boolean Equations (from K-Map)</h3>
+          <div class="equations-grid">
+            <div class="eq-block">
+              <span class="eq-label">State Decoder</span>
+              <code>w_IDLE   = ~Q1 · ~Q0</code>
+              <code>w_S1     = ~Q1 ·  Q0</code>
+              <code>w_S2     =  Q1 · ~Q0</code>
+              <code>w_UNLOCK =  Q1 ·  Q0</code>
+            </div>
+            <div class="eq-block">
+              <span class="eq-label">Next-State Excitation (D Flip-Flop Inputs)</span>
+              <code>no_btn = ~(B1 + B2 + B3)</code>
+              <code>D1 = ~RST · [(w_S1·B2) + (w_S2·B3) + (w_S2·no_btn)]</code>
+              <code>D0 = ~RST · [(w_IDLE·B1) + (w_S1·no_btn) + (w_S2·B3)]</code>
+            </div>
+            <div class="eq-block">
+              <span class="eq-label">Moore Output</span>
+              <code>BELL = Q1 · Q0</code>
+              <p class="eq-note">Bell is asserted HIGH exclusively in UNLOCK state (11). Rings for one clock cycle only.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         SECTION 3: VERILOG HDL CODE
+         ═══════════════════════════════════════════════════════════ -->
+    <section class="section-wrapper" id="section-verilog">
+      <div class="section-label">
+        <span class="section-num">03</span>
+        <span class="section-title">Verilog HDL Implementation</span>
+        <span class="section-desc">Synthesizable Verilog module — verilog/combination_doorbell.v</span>
+      </div>
+
+      <div class="content-card">
+        <div class="code-tabs">
+          <button class="code-tab active" data-target="rtl-code">combination_doorbell.v (RTL)</button>
+          <button class="code-tab" data-target="tb-code">tb_combination_doorbell.v (Testbench)</button>
+          <button class="copy-code-btn" id="copyCodeBtn" title="Copy code">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            <span id="copyLabel">Copy</span>
+          </button>
+        </div>
+
+        <div class="code-panel active" id="rtl-code">
+          <pre class="code-block"><code><span class="kw">// ================================================================</span>
+<span class="kw">// Module</span><span class="str">: combination_doorbell</span>
+<span class="kw">// Description</span><span class="str">: Electronic Combination Doorbell FSM (B1 → B2 → B3)</span>
+<span class="kw">// Course</span><span class="str">: R25DER302 : Digital Electronics</span>
+<span class="kw">// College</span><span class="str">: Christ College of Engineering (Autonomous), Irinjalakuda</span>
+<span class="kw">// ================================================================</span>
+<span class="kw">`timescale</span> <span class="num">1ns</span> / <span class="num">1ps</span>
+
+<span class="kw">module</span> <span class="fn">combination_doorbell</span>(
+    <span class="kw">input  wire</span> clk,      <span class="cmt">// System Clock</span>
+    <span class="kw">input  wire</span> rst,      <span class="cmt">// Synchronous Reset (Active-High)</span>
+    <span class="kw">input  wire</span> b1, b2, b3, <span class="cmt">// Push-buttons</span>
+    <span class="kw">output wire</span> bell      <span class="cmt">// Bell Chime Output</span>
+);
+
+    <span class="cmt">// ── 2-Bit State Encoding ──</span>
+    <span class="kw">localparam</span> [<span class="num">1</span>:<span class="num">0</span>] IDLE   = <span class="num">2'b00</span>,   <span class="cmt">// Waiting for B1</span>
+                       S1     = <span class="num">2'b01</span>,   <span class="cmt">// B1 valid, waiting for B2</span>
+                       S2     = <span class="num">2'b10</span>,   <span class="cmt">// B1+B2 valid, waiting for B3</span>
+                       UNLOCK = <span class="num">2'b11</span>;  <span class="cmt">// Accepted! Bell HIGH 1 cycle</span>
+
+    <span class="kw">reg</span> [<span class="num">1</span>:<span class="num">0</span>] state, next_state;
+
+    <span class="cmt">// ── 01: Sequential State Register ──</span>
+    <span class="kw">always</span> @(<span class="kw">posedge</span> clk) <span class="kw">begin</span>
+        <span class="kw">if</span> (rst)
+            state &lt;= IDLE;
+        <span class="kw">else</span>
+            state &lt;= next_state;
+    <span class="kw">end</span>
+
+    <span class="cmt">// ── 02: Combinational Next-State Logic ──</span>
+    <span class="kw">always</span> @(*) <span class="kw">begin</span>
+        next_state = state;  <span class="cmt">// default: hold state</span>
+        <span class="kw">case</span> (state)
+            IDLE:   next_state = b1 ? S1 : IDLE;
+            S1:     <span class="kw">if</span> (b2)        next_state = S2;
+                    <span class="kw">else if</span> (b1 || b3) next_state = IDLE;
+            S2:     <span class="kw">if</span> (b3)        next_state = UNLOCK;
+                    <span class="kw">else if</span> (b1 || b2) next_state = IDLE;
+            UNLOCK: next_state = IDLE;  <span class="cmt">// auto-return after 1 cycle</span>
+            <span class="kw">default</span>: next_state = IDLE;
+        <span class="kw">endcase</span>
+    <span class="kw">end</span>
+
+    <span class="cmt">// ── 03: Moore Output — Bell rings only in UNLOCK ──</span>
+    <span class="kw">assign</span> bell = (state == UNLOCK);
+
+<span class="kw">endmodule</span></code></pre>
+        </div>
+
+        <div class="code-panel" id="tb-code" style="display:none;">
+          <pre class="code-block"><code><span class="kw">// ================================================================</span>
+<span class="kw">// Testbench</span><span class="str">: tb_combination_doorbell</span>
+<span class="kw">// Tests</span><span class="str">: T1(B1→B2→B3 UNLOCK), T2(B1→B3 wrong), T3(B2 wrong start)</span>
+<span class="kw">// ================================================================</span>
+<span class="kw">`timescale</span> <span class="num">1ns</span> / <span class="num">1ps</span>
+
+<span class="kw">module</span> <span class="fn">tb_combination_doorbell</span>;
+    <span class="kw">reg</span>  clk, rst, b1, b2, b3;
+    <span class="kw">wire</span> bell;
+
+    combination_doorbell uut (.clk(clk),.rst(rst),
+                               .b1(b1),.b2(b2),.b3(b3),.bell(bell));
+
+    <span class="kw">always</span> #5 clk = ~clk;
+
+    <span class="kw">initial</span> <span class="kw">begin</span>
+        $dumpfile(<span class="str">"doorbell_simulation.vcd"</span>);
+        $dumpvars(<span class="num">0</span>, tb_combination_doorbell);
+
+        clk=<span class="num">0</span>; rst=<span class="num">1</span>; b1=<span class="num">0</span>; b2=<span class="num">0</span>; b3=<span class="num">0</span>;
+        #<span class="num">20</span> rst=<span class="num">0</span>;  <span class="cmt">// Release reset → IDLE</span>
+
+        <span class="cmt">// ── TEST 1: Correct sequence B1 → B2 → B3 ──</span>
+        @(<span class="kw">posedge</span> clk); b1=<span class="num">1</span>; @(<span class="kw">posedge</span> clk); b1=<span class="num">0</span>;  <span class="cmt">// → S1</span>
+        @(<span class="kw">posedge</span> clk); b2=<span class="num">1</span>; @(<span class="kw">posedge</span> clk); b2=<span class="num">0</span>;  <span class="cmt">// → S2</span>
+        @(<span class="kw">posedge</span> clk); b3=<span class="num">1</span>; @(<span class="kw">posedge</span> clk); b3=<span class="num">0</span>;  <span class="cmt">// → UNLOCK</span>
+        <span class="kw">if</span> (bell === <span class="num">1</span>'b1) $display(<span class="str">"TEST 1 PASS: Bell=1 (UNLOCK)"</span>);
+        @(<span class="kw">posedge</span> clk);  <span class="cmt">// → IDLE auto-reset</span>
+        #<span class="num">20</span>;
+
+        <span class="cmt">// ── TEST 2: Wrong sequence B1 → B3 ──</span>
+        @(<span class="kw">posedge</span> clk); b1=<span class="num">1</span>; @(<span class="kw">posedge</span> clk); b1=<span class="num">0</span>;  <span class="cmt">// → S1</span>
+        @(<span class="kw">posedge</span> clk); b3=<span class="num">1</span>; @(<span class="kw">posedge</span> clk); b3=<span class="num">0</span>;  <span class="cmt">// → IDLE (reject)</span>
+        <span class="kw">if</span> (bell === <span class="num">1</span>'b0) $display(<span class="str">"TEST 2 PASS: Bell=0 (Rejected)"</span>);
+        #<span class="num">20</span>;
+
+        <span class="cmt">// ── TEST 3: Wrong start B2 in IDLE ──</span>
+        @(<span class="kw">posedge</span> clk); b2=<span class="num">1</span>; @(<span class="kw">posedge</span> clk); b2=<span class="num">0</span>;  <span class="cmt">// stays IDLE</span>
+        <span class="kw">if</span> (bell === <span class="num">1</span>'b0) $display(<span class="str">"TEST 3 PASS: Bell=0 (Ignored)"</span>);
+
+        #<span class="num">50</span>; $finish;
+    <span class="kw">end</span>
+<span class="kw">endmodule</span></code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         SECTION 4: VERIFICATION RESULTS
+         ═══════════════════════════════════════════════════════════ -->
+    <section class="section-wrapper" id="section-tests">
+      <div class="section-label">
+        <span class="section-num">04</span>
+        <span class="section-title">Verification Test Results</span>
+        <span class="section-desc">Three test vectors matching the PDF specification (Page 5)</span>
+      </div>
+
+      <div class="content-card">
+        <div class="test-grid">
+          <div class="test-card test-pass">
+            <div class="test-icon">✓</div>
+            <div class="test-body">
+              <div class="test-name">Test 1 — Correct Sequence</div>
+              <div class="test-input"><code>B1 → B2 → B3</code></div>
+              <div class="test-flow">
+                <span class="st st-idle">IDLE</span>
+                <span class="st-arr">→</span>
+                <span class="st st-s1">S1</span>
+                <span class="st-arr">→</span>
+                <span class="st st-s2">S2</span>
+                <span class="st-arr">→</span>
+                <span class="st st-unlock">UNLOCK</span>
+                <span class="st-arr">→</span>
+                <span class="st st-idle">IDLE</span>
+              </div>
+              <div class="test-result result-pass">Bell = <strong>1</strong> (HIGH · Ringing) for 1 clock cycle ✓</div>
+            </div>
+          </div>
+
+          <div class="test-card test-reject">
+            <div class="test-icon">✗</div>
+            <div class="test-body">
+              <div class="test-name">Test 2 — Wrong Input at S1</div>
+              <div class="test-input"><code>B1 → B3</code> (B3 pressed when B2 expected)</div>
+              <div class="test-flow">
+                <span class="st st-idle">IDLE</span>
+                <span class="st-arr">→</span>
+                <span class="st st-s1">S1</span>
+                <span class="st-arr" style="color:#ef4444">✗</span>
+                <span class="st st-idle">IDLE</span>
+              </div>
+              <div class="test-result result-reject">Bell = <strong>0</strong> (LOW · Silent) — Sequence rejected ✓</div>
+            </div>
+          </div>
+
+          <div class="test-card test-reject">
+            <div class="test-icon">✗</div>
+            <div class="test-body">
+              <div class="test-name">Test 3 — Wrong Starting Button</div>
+              <div class="test-input"><code>B2</code> pressed from IDLE (must start with B1)</div>
+              <div class="test-flow">
+                <span class="st st-idle">IDLE</span>
+                <span class="st-arr" style="color:#ef4444">✗</span>
+                <span class="st st-idle">IDLE</span>
+              </div>
+              <div class="test-result result-reject">Bell = <strong>0</strong> (LOW · Silent) — Wrong start ignored ✓</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         PAGE FOOTER
+         ═══════════════════════════════════════════════════════════ -->
+    <footer class="page-footer">
+      <div class="footer-content">
+        <span class="footer-title">Electronic Combination Doorbell</span>
+        <span class="footer-sub">Micro Project · R25DER302 Digital Electronics · Christ College of Engineering (Autonomous), Irinjalakuda</span>
+      </div>
+    </footer>
+
+  </div><!-- .page-wrapper -->
+
+  <!-- Original doorbell controller (keeps existing app.js fully intact) -->
+  <script src="app.js"></script>
+  <!-- Additional section interactions -->
+  <script src="sections.js"></script>
+</body>
+</html>

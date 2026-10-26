@@ -1,0 +1,928 @@
+/* =====================================================================
+   ELECTRONIC COMBINATION DOORBELL - ORANGE & WHITE DESIGN SYSTEM
+   Micro Project: Digital Electronics (R25DER302)
+   Aesthetic: Premium Minimalist Industrial Hardware (White & Vivid Orange)
+   ===================================================================== */
+
+:root {
+  /* Primary Orange & White Palette */
+  --orange-primary: #ff6b00;
+  --orange-bright: #ff851b;
+  --orange-deep: #e05300;
+  --orange-glow: rgba(255, 107, 0, 0.4);
+  --orange-dim: rgba(255, 107, 0, 0.12);
+  --orange-subtle: rgba(255, 107, 0, 0.06);
+
+  /* White & Light Neutrals */
+  --white-pure: #ffffff;
+  --white-off: #f8fafc;
+  --white-chassis: #ffffff;
+  --bg-page: #f4f5f8;
+  --border-light: rgba(0, 0, 0, 0.08);
+  --border-orange: rgba(255, 107, 0, 0.35);
+
+  /* Text & Inset Contrasts */
+  --text-dark: #0f172a;
+  --text-muted: #64748b;
+  --text-dim: #94a3b8;
+  --display-dark: #0d131f;
+
+  /* Red Alert Bell (Ring Condition) */
+  --red-bell: #ef4444;
+  --red-bright: #ff2238;
+  --red-glow: rgba(239, 68, 68, 0.6);
+
+  /* Typography */
+  --font-display: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-body: 'Plus Jakarta Sans', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* Transitions */
+  --trans-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  --trans-bounce: 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Base Reset */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-page);
+  color: var(--text-dark);
+  font-family: var(--font-body);
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+  line-height: 1.5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1.5rem;
+}
+
+/* Ambient Background Atmosphere */
+.ambient-glow {
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(140px);
+  transition: opacity 0.6s ease;
+}
+
+.ambient-orange {
+  top: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 650px;
+  height: 650px;
+  background: radial-gradient(circle, rgba(255, 107, 0, 0.15) 0%, rgba(255, 107, 0, 0) 70%);
+}
+
+.ambient-red {
+  top: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 700px;
+  height: 700px;
+  background: radial-gradient(circle, rgba(239, 68, 68, 0.3) 0%, rgba(239, 68, 68, 0) 75%);
+  opacity: 0;
+}
+
+.ambient-red.active {
+  opacity: 1;
+  animation: pulse-ambient-red 1.5s infinite alternate ease-in-out;
+}
+
+@keyframes pulse-ambient-red {
+  0% { transform: translateX(-50%) scale(0.95); opacity: 0.6; }
+  100% { transform: translateX(-50%) scale(1.1); opacity: 1; }
+}
+
+.grid-overlay {
+  position: fixed;
+  inset: 0;
+  background-image: 
+    linear-gradient(to right, rgba(0, 0, 0, 0.035) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.035) 1px, transparent 1px);
+  background-size: 32px 32px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Page Wrapper */
+.page-wrapper {
+  position: relative;
+  z-index: 5;
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+/* =====================================================================
+   DEVICE CHASSIS: PURE WHITE WITH VIVID ORANGE DETAILS
+   ===================================================================== */
+.device-card {
+  width: 100%;
+}
+
+.device-chassis {
+  background: linear-gradient(175deg, #ffffff 0%, #fafbfc 65%, #f1f4f8 100%);
+  border: 2px solid rgba(255, 107, 0, 0.25);
+  border-radius: 28px;
+  padding: 2.2rem 2rem;
+  box-shadow: 
+    0 25px 60px -15px rgba(255, 107, 0, 0.15),
+    0 20px 45px -10px rgba(15, 23, 42, 0.12),
+    0 0 0 1px rgba(255, 255, 255, 0.8) inset;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  transition: border-color var(--trans-fast);
+}
+
+/* Metallic Screws with subtle orange edge reflection */
+.screw {
+  position: absolute;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #e2e8f0 0%, #94a3b8 100%);
+  box-shadow: 
+    inset 0 1px 1px rgba(255, 255, 255, 0.9),
+    0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.screw::after {
+  content: '';
+  position: absolute;
+  top: 4.5px;
+  left: 2px;
+  width: 7px;
+  height: 1.5px;
+  background: rgba(71, 85, 105, 0.8);
+  transform: rotate(45deg);
+}
+
+.screw.top-left { top: 14px; left: 14px; }
+.screw.top-right { top: 14px; right: 14px; }
+.screw.bottom-left { bottom: 14px; left: 14px; }
+.screw.bottom-right { bottom: 14px; right: 14px; }
+
+/* Chassis Header */
+.chassis-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 0.9rem;
+  border-bottom: 1.5px solid rgba(0, 0, 0, 0.06);
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.brand-name {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  color: var(--text-dark);
+}
+
+.brand-model {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--orange-primary);
+  letter-spacing: 0.12em;
+}
+
+.header-right-group {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+/* Sound button */
+.sound-chip-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: var(--white-pure);
+  border: 1.5px solid var(--border-orange);
+  color: var(--orange-primary);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 0.3rem 0.65rem;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: all var(--trans-fast);
+  box-shadow: 0 1px 3px rgba(255, 107, 0, 0.1);
+}
+
+.sound-chip-btn:hover {
+  background: var(--orange-dim);
+  border-color: var(--orange-primary);
+  transform: translateY(-1px);
+}
+
+/* Security Status Chip */
+.security-status-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  background: var(--white-pure);
+  padding: 0.35rem 0.8rem;
+  border-radius: 9999px;
+  border: 1.5px solid var(--border-orange);
+  color: var(--orange-primary);
+  box-shadow: 0 2px 6px rgba(255, 107, 0, 0.12);
+}
+
+.status-indicator-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--orange-primary);
+  box-shadow: 0 0 8px var(--orange-primary);
+}
+
+.security-status-chip.ringing {
+  border-color: var(--red-bell);
+  background: rgba(239, 68, 68, 0.08);
+  color: var(--red-bell);
+}
+
+.security-status-chip.ringing .status-indicator-dot {
+  background: var(--red-bright);
+  box-shadow: 0 0 12px var(--red-bright);
+  animation: flash-dot 0.35s infinite alternate;
+}
+
+@keyframes flash-dot {
+  from { opacity: 0.3; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1.3); }
+}
+
+/* =====================================================================
+   ALARM MODULE: RED LIGHT + SPEAKER GRILLE
+   ===================================================================== */
+.alarm-module {
+  background: #ffffff;
+  border: 1.5px solid rgba(255, 107, 0, 0.22);
+  border-radius: 20px;
+  padding: 1.5rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  align-items: center;
+  box-shadow: 
+    inset 0 2px 6px rgba(0, 0, 0, 0.03),
+    0 4px 15px rgba(255, 107, 0, 0.05);
+}
+
+/* Photorealistic Red Dome LED */
+.red-light-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.led-bezel {
+  width: 94px;
+  height: 94px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #f8fafc 0%, #e2e8f0 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 
+    0 8px 18px rgba(0, 0, 0, 0.12),
+    inset 0 2px 4px rgba(255, 255, 255, 0.9),
+    0 0 0 3px rgba(255, 107, 0, 0.25);
+  position: relative;
+}
+
+.red-led {
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #661818 0%, #360c0c 60%, #1a0505 100%);
+  border: 1.5px solid #4a1414;
+  position: relative;
+  box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.6);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.led-core {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #4a0d0d;
+  opacity: 0.6;
+  transition: all 0.2s ease;
+}
+
+.led-lens-glare {
+  position: absolute;
+  top: 9px;
+  left: 14px;
+  width: 16px;
+  height: 9px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.35);
+  transform: rotate(-30deg);
+  pointer-events: none;
+}
+
+.led-pulse-rings .ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border: 2px solid rgba(239, 68, 68, 0);
+  pointer-events: none;
+}
+
+/* RED LED ACTIVE STATE (RINGING!) */
+.red-light-container.ringing .red-led {
+  background: radial-gradient(circle at 35% 35%, #ffffff 0%, #ff6b6b 22%, #ef4444 58%, #b91c1c 95%);
+  border-color: #ff9999;
+  box-shadow: 
+    0 0 25px #ef4444,
+    0 0 55px rgba(239, 68, 68, 0.85),
+    0 0 95px rgba(239, 68, 68, 0.7),
+    inset 0 0 18px #fff;
+  animation: strobe-led 0.22s infinite alternate ease-in-out;
+}
+
+.red-light-container.ringing .led-core {
+  background: #ffffff;
+  opacity: 1;
+  box-shadow: 0 0 16px #ffffff;
+}
+
+.red-light-container.ringing .led-pulse-rings .ring-1 {
+  width: 95px;
+  height: 95px;
+  border-color: rgba(239, 68, 68, 0.85);
+  animation: ring-expand 1s infinite cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.red-light-container.ringing .led-pulse-rings .ring-2 {
+  width: 135px;
+  height: 135px;
+  border-color: rgba(239, 68, 68, 0.55);
+  animation: ring-expand 1s infinite 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.red-light-container.ringing .led-pulse-rings .ring-3 {
+  width: 175px;
+  height: 175px;
+  border-color: rgba(239, 68, 68, 0.3);
+  animation: ring-expand 1s infinite 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes strobe-led {
+  0% { transform: scale(0.98); filter: brightness(1.1); }
+  100% { transform: scale(1.06); filter: brightness(1.5); }
+}
+
+@keyframes ring-expand {
+  0% { transform: translate(-50%, -50%) scale(0.6); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(1.4); opacity: 0; }
+}
+
+.led-status-caption {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.caption-label {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+.caption-state {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--text-dark);
+  transition: color var(--trans-fast);
+}
+
+.red-light-container.ringing .caption-state {
+  color: var(--red-bell);
+  text-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
+}
+
+/* Speaker Grille with White/Orange styling */
+.speaker-grille {
+  position: relative;
+  background: #f8fafc;
+  border: 1.5px solid rgba(255, 107, 0, 0.2);
+  border-radius: 16px;
+  padding: 1.4rem 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  align-items: center;
+  justify-content: center;
+  min-height: 110px;
+  overflow: hidden;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+.grille-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.grille-row span {
+  width: 5.5px;
+  height: 5.5px;
+  background: #cbd5e1;
+  border-radius: 50%;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.25);
+  transition: all 0.2s ease;
+}
+
+/* Sound wave animations */
+.sound-wave-particles {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.speaker-grille.ringing .sound-wave-particles {
+  opacity: 1;
+}
+
+.speaker-grille.ringing .grille-row span {
+  background: var(--orange-primary);
+  box-shadow: 0 0 8px var(--orange-primary);
+}
+
+.sound-wave-particles .wave {
+  position: absolute;
+  border: 2px solid var(--orange-primary);
+  border-radius: 50%;
+  animation: acoustic-wave 1s infinite ease-out;
+}
+
+.sound-wave-particles .wave-1 { animation-delay: 0s; }
+.sound-wave-particles .wave-2 { animation-delay: 0.3s; }
+.sound-wave-particles .wave-3 { animation-delay: 0.6s; }
+
+@keyframes acoustic-wave {
+  0% { width: 10px; height: 10px; opacity: 1; }
+  100% { width: 130px; height: 130px; opacity: 0; }
+}
+
+/* =====================================================================
+   REGISTER DISPLAY PLATE: Q1, Q0 & CURRENT STATE
+   ===================================================================== */
+.register-display-plate {
+  background: #ffffff;
+  border: 1.5px solid rgba(255, 107, 0, 0.22);
+  border-radius: 18px;
+  padding: 1rem 1.4rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 3px 10px rgba(255, 107, 0, 0.05);
+}
+
+.reg-label-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.reg-title {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: var(--text-dark);
+}
+
+.reg-verilog {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--orange-primary);
+}
+
+.reg-digits-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.bit-box {
+  background: #ffffff;
+  border: 2px solid rgba(255, 107, 0, 0.3);
+  border-radius: 10px;
+  padding: 0.4rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 48px;
+  box-shadow: 0 2px 6px rgba(255, 107, 0, 0.08);
+}
+
+.bit-sub {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.bit-val {
+  font-family: var(--font-mono);
+  font-size: 1.45rem;
+  font-weight: 800;
+  color: var(--orange-primary);
+  line-height: 1.1;
+  text-shadow: 0 0 10px rgba(255, 107, 0, 0.35);
+  transition: all var(--trans-fast);
+}
+
+.state-badge-wrap {
+  margin-left: 0.3rem;
+}
+
+.state-pill {
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  padding: 0.45rem 1rem;
+  border-radius: 10px;
+  background: var(--orange-primary);
+  color: var(--white-pure);
+  box-shadow: 0 4px 12px rgba(255, 107, 0, 0.35);
+  display: inline-block;
+  min-width: 90px;
+  text-align: center;
+  transition: all var(--trans-fast);
+}
+
+.state-pill.state-idle {
+  background: #e2e8f0;
+  color: #334155;
+  box-shadow: none;
+}
+
+.state-pill.state-s1 {
+  background: #ff851b;
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(255, 133, 27, 0.4);
+}
+
+.state-pill.state-s2 {
+  background: #ea580c;
+  color: #ffffff;
+  box-shadow: 0 4px 16px rgba(234, 88, 12, 0.45);
+}
+
+.state-pill.state-unlock {
+  background: var(--red-bell);
+  color: #ffffff;
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.7);
+  animation: pulse-unlock 0.7s infinite alternate ease-in-out;
+}
+
+@keyframes pulse-unlock {
+  from { transform: scale(1); }
+  to { transform: scale(1.06); filter: brightness(1.2); }
+}
+
+/* =====================================================================
+   HIGH-CONTRAST DARK DISPLAY FOR SYSTEM STATUS
+   ===================================================================== */
+.lcd-screen {
+  background: linear-gradient(180deg, #111724 0%, #0a0e17 100%);
+  border: 2px solid rgba(255, 107, 0, 0.35);
+  border-radius: 16px;
+  padding: 1.1rem 1.25rem;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 
+    inset 0 3px 10px rgba(0, 0, 0, 0.8),
+    0 4px 15px rgba(0, 0, 0, 0.12);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.lcd-glare {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 40%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0) 100%);
+  pointer-events: none;
+}
+
+.lcd-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.lcd-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--orange-bright);
+  box-shadow: 0 0 8px var(--orange-bright);
+}
+
+.lcd-title {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--orange-bright);
+  margin-right: auto;
+  margin-left: 0.5rem;
+}
+
+.lcd-clock {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+
+.lcd-message {
+  font-family: var(--font-mono);
+  font-size: 0.92rem;
+  color: #f8fafc;
+  min-height: 2.6rem;
+  display: flex;
+  align-items: center;
+  line-height: 1.4;
+  transition: color var(--trans-fast);
+}
+
+.lcd-message.warn {
+  color: #fca5a5;
+  animation: shake 0.3s ease;
+}
+
+.lcd-message.success {
+  color: #86efac;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
+.lcd-progress-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.progress-step {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 0.25rem 0.8rem;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #64748b;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all var(--trans-fast);
+}
+
+.progress-arrow {
+  color: #64748b;
+  font-size: 0.95rem;
+}
+
+.progress-step.active {
+  background: rgba(255, 107, 0, 0.25);
+  color: var(--orange-bright);
+  border-color: var(--orange-primary);
+  box-shadow: 0 0 12px rgba(255, 107, 0, 0.5);
+}
+
+.progress-step.completed {
+  background: var(--orange-primary);
+  color: #ffffff;
+  border-color: var(--orange-bright);
+}
+
+/* =====================================================================
+   THE 3 PHYSICAL PUSH BUTTONS (WHITE & ORANGE HARDWARE KEYS)
+   ===================================================================== */
+.keypad-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.keypad-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+}
+
+.keypad-label-row .hint-text {
+  color: var(--orange-primary);
+  font-weight: 700;
+}
+
+.doorbell-buttons-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.15rem;
+}
+
+.push-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  outline: none;
+  padding: 0;
+  position: relative;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn-cap {
+  background: linear-gradient(160deg, #ffffff 0%, #fbfcfd 55%, #f1f4f9 100%);
+  border: 2px solid rgba(255, 107, 0, 0.3);
+  border-radius: 18px;
+  padding: 1.5rem 0.6rem 1.2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  position: relative;
+  z-index: 2;
+  transform: translateY(0);
+  transition: transform 0.08s ease, background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: 
+    0 1px 0 rgba(255, 255, 255, 1) inset,
+    0 6px 0 #cbd5e1,
+    0 10px 18px rgba(255, 107, 0, 0.12),
+    0 8px 16px rgba(0, 0, 0, 0.08);
+}
+
+.btn-shadow {
+  position: absolute;
+  inset: 0;
+  background: #94a3b8;
+  border-radius: 18px;
+  z-index: 1;
+}
+
+.btn-id {
+  font-family: var(--font-display);
+  font-size: 1.85rem;
+  font-weight: 800;
+  color: var(--orange-primary);
+  letter-spacing: -0.01em;
+  text-shadow: 0 1px 2px rgba(255, 107, 0, 0.15);
+}
+
+.btn-subtext {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+.btn-indicator {
+  width: 18px;
+  height: 4px;
+  background: #cbd5e1;
+  border-radius: 2px;
+  margin-top: 0.2rem;
+  transition: all 0.2s ease;
+}
+
+/* Button Hover & Active States */
+.push-btn:hover .btn-cap {
+  border-color: var(--orange-primary);
+  box-shadow: 
+    0 1px 0 rgba(255, 255, 255, 1) inset,
+    0 6px 0 #cbd5e1,
+    0 12px 24px rgba(255, 107, 0, 0.22);
+}
+
+.push-btn:active .btn-cap,
+.push-btn.pressed .btn-cap {
+  transform: translateY(6px);
+  box-shadow: 
+    0 1px 0 rgba(255, 255, 255, 0.4) inset,
+    0 0 0 #cbd5e1,
+    0 2px 6px rgba(0, 0, 0, 0.15);
+  border-color: var(--orange-primary);
+  background: #fff8f2;
+}
+
+.push-btn:active .btn-indicator,
+.push-btn.pressed .btn-indicator {
+  background: var(--orange-primary);
+  box-shadow: 0 0 10px var(--orange-primary);
+}
+
+/* Error highlight on button */
+.push-btn.error-press .btn-cap {
+  border-color: var(--red-bell);
+  background: #fff5f5;
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.35);
+}
+
+.push-btn.error-press .btn-indicator {
+  background: var(--red-bell);
+  box-shadow: 0 0 8px var(--red-bell);
+}
+
+/* Chassis Bottom Bar: Reset & Specs */
+.chassis-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 0.9rem;
+  border-top: 1.5px solid rgba(0, 0, 0, 0.06);
+}
+
+.discrete-reset-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: var(--white-pure);
+  border: 1.5px solid var(--border-orange);
+  color: var(--orange-primary);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.45rem 0.95rem;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all var(--trans-fast);
+  box-shadow: 0 2px 6px rgba(255, 107, 0, 0.08);
+}
+
+.discrete-reset-btn:hover {
+  background: var(--orange-primary);
+  color: var(--white-pure);
+  box-shadow: 0 4px 12px rgba(255, 107, 0, 0.3);
+  transform: translateY(-1px);
+}
+
+.reset-icon {
+  font-size: 0.95rem;
+}
+
+.fsm-spec-note {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--text-dim);
+}
