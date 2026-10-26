@@ -1,10 +1,14 @@
 # Electronic Combination Doorbell (B1 → B2 → B3)
 
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-GitHub%20Pages-2ea44f.svg?style=flat-square&logo=github)](https://ajvadkp.github.io/Electronic-combination-doorbell/)
 [![Verilog HDL](https://img.shields.io/badge/HDL-Verilog%202001-blue.svg?style=flat-square&logo=microchip)](verilog/combination_doorbell.v)
 [![Simulation Status](https://img.shields.io/badge/Simulation-100%25%20Passed-2ea44f.svg?style=flat-square)](verilog/tb_combination_doorbell.v)
 [![Web Audio API](https://img.shields.io/badge/Audio-Web%20Audio%20API-ff6b00.svg?style=flat-square)](app.js)
 [![Zero Dependency](https://img.shields.io/badge/Dependencies-Zero-brightgreen.svg?style=flat-square)](server.js)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
+
+> 🚀 **Live Interactive Simulator**: Experience the full hardware doorbell model directly in your browser:  
+> 👉 **[https://ajvadkp.github.io/Electronic-combination-doorbell/](https://ajvadkp.github.io/Electronic-combination-doorbell/)**
 
 An industrial-grade, 4-state synchronous **Moore Finite State Machine (FSM)** that actuates a doorbell chime strictly upon entering the sequential combination **`B1 → B2 → B3`**. Designed with synthesizable Verilog HDL, gate-level schematic netlists, and an interactive browser-based hardware simulator featuring real-time Web Audio API chime synthesis.
 
@@ -151,24 +155,27 @@ TEST 3 PASS: Bell=0 (Ignored) - Unauthorized Starting Button Correctly Ignored
 
 ---
 
-## Running the Web Simulator Locally
+## Web Simulator & Live Demo
 
-The web simulator requires **no external dependencies or build steps**. It runs out of the box in any modern browser:
+### 🌐 Option 1: Live Interactive Demo (No Setup Needed)
+The web simulation is deployed and accessible directly via GitHub Pages:  
+👉 **[https://ajvadkp.github.io/Electronic-combination-doorbell/](https://ajvadkp.github.io/Electronic-combination-doorbell/)**
 
-### Method 1: Using the Built-In Node Server (Recommended)
+### 💻 Option 2: Running Locally via Node.js
+The simulator has zero external dependencies and runs with Node.js built-ins:
 ```bash
 # Clone the repository
-git clone https://github.com/<your-username>/electronic-combination-doorbell.git
-cd electronic-combination-doorbell
+git clone https://github.com/AJVADkp/Electronic-combination-doorbell.git
+cd Electronic-combination-doorbell
 
-# Launch the server
+# Launch the local server
 npm start
 # or: node server.js
 ```
 Open **`http://localhost:8080/`** in your browser.
 
-### Method 2: Direct File Execution / Static Hosting
-Simply open `index.html` directly in any web browser, or host the repository directly on **GitHub Pages** with zero configuration.
+### 📁 Option 3: Direct File Execution
+You can also open `index.html` directly in any modern web browser without a web server.
 
 ---
 
