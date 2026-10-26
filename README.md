@@ -14,7 +14,7 @@ Developed as a micro-project for **R25DER302: Digital Electronics**, Department 
 
 ## Showcase & System Architecture
 
-![Electronic Combination Doorbell Showcase](assets/preview.png)
+![Electronic Combination Doorbell Showcase](assets/doorbell_showcase.png)
 
 ```
   +-----------+  B1 = 1   +-----------+  B2 = 1   +-----------+  B3 = 1   +---------------+
@@ -112,7 +112,7 @@ $$\text{BELL} = Q_1 \cdot Q_0$$
 │   └── engineering_report.md       # Comprehensive academic engineering report
 │
 └── assets/                         # Visual assets for documentation
-    └── preview.png                 # Web simulator showcase banner
+    └── doorbell_showcase.png       # Web simulator showcase banner
 ```
 
 ---
